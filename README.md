@@ -36,7 +36,3 @@ The report utilizes a specialized Star Schema to track cohorts and installation 
 <p align="center">
   <img src="https://raw.githubusercontent.com/mauroemartinez/Customer_Churn_and_Behavior_Analysis-Technical-Challenge/main/Pictures/Data%20Model.png" alt="Churn Data Model" width=90%>
 </p>
-
----
-**Author:** Mauro Ezequiel Martínez  
-**Focus:** Data Analytics | Business Intelligence | Customer Success
