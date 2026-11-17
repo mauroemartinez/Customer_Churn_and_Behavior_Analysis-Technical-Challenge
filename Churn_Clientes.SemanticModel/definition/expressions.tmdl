@@ -1,0 +1,165 @@
+/// Carpeta con los CSV de origen (carpeta data del repositorio). Cambiala si clonás el repo en otra ruta.
+expression CarpetaDatos = "C:\Users\Mauro\Documents\Datos\Proyectos\Churn_Challenge\data\" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: 3edf474d-2d57-5a30-83c2-fbe80606bc0d
+	queryGroup: Parámetros
+
+	annotation PBI_ResultType = Text
+
+/// Lee un CSV de la carpeta de datos (UTF-8, separado por comas) y promueve los encabezados.
+expression fnLeerCsv =
+		let
+		    // Lee un CSV de CarpetaDatos con codificación UTF-8 y usa la primera fila como encabezados
+		    fnLeerCsv = (archivo as text) as table =>
+		        let
+		            Contenido = Csv.Document(File.Contents(CarpetaDatos & archivo), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+		            Encabezados = Table.PromoteHeaders(Contenido, [PromoteAllScalars = true])
+		        in
+		            Encabezados,
+		    Documentacion = type function (archivo as (type text meta [Documentation.FieldCaption = "Archivo CSV dentro de CarpetaDatos"])) as table
+		        meta [
+		            Documentation.Name = "fnLeerCsv",
+		            Documentation.LongDescription = "Lee un archivo CSV de la carpeta de datos con codificación UTF-8 y promueve la primera fila como encabezados. Los tipos se asignan en cada consulta de origen.",
+		            Documentation.Examples = {
+		                [Description = "Listado de campañas", Code = "fnLeerCsv(""segmentos.csv"")", Result = "Tabla con user_id, target_churn_indicator, range_group y n_previous_registers"]
+		            }
+		        ]
+		in
+		    Value.ReplaceType(fnLeerCsv, Documentacion)
+	lineageTag: 3d1dc558-d6c4-51d5-9865-c4431fc41ebe
+	queryGroup: Funciones
+
+	annotation PBI_ResultType = Function
+
+/// Unifica los nombres de provincia: sin el sufijo Province, con tildes y con CABA para la Ciudad de Buenos Aires.
+expression fnProvincia =
+		let
+		    // Unifica los nombres de provincia del CSV (31 variantes) en las 24 jurisdicciones del país
+		    fnProvincia = (nombre as nullable text) as nullable text =>
+		        let
+		            SinSufijo = if nombre = null then null else Text.Trim(Text.Replace(nombre, " Province", "")),
+		            Equivalencias = [
+		                #"Buenos Aires F.D." = "CABA", Cordoba = "Córdoba", #"Entre Rios" = "Entre Ríos",
+		                Neuquen = "Neuquén", #"Rio Negro" = "Río Negro", Tucuman = "Tucumán"
+		            ],
+		            Resultado = if SinSufijo = null then null else Record.FieldOrDefault(Equivalencias, SinSufijo, SinSufijo)
+		        in
+		            Resultado,
+		    Documentacion = type function (nombre as (type nullable text meta [Documentation.FieldCaption = "Provincia tal como viene en el CSV"])) as nullable text
+		        meta [
+		            Documentation.Name = "fnProvincia",
+		            Documentation.LongDescription = "Devuelve el nombre de provincia normalizado: sin el sufijo Province, con tildes y con CABA para la Ciudad Autónoma de Buenos Aires.",
+		            Documentation.Examples = {
+		                [Description = "Ciudad de Buenos Aires", Code = "fnProvincia(""Buenos Aires F.D."")", Result = """CABA"""],
+		                [Description = "Sufijo en inglés", Code = "fnProvincia(""Entre Ríos Province"")", Result = """Entre Ríos"""]
+		            }
+		        ]
+		in
+		    Value.ReplaceType(fnProvincia, Documentacion)
+	lineageTag: 0c39848c-16f9-5738-9d94-a2eba98a97d6
+	queryGroup: Funciones
+
+	annotation PBI_ResultType = Function
+
+/// Agrega las tildes que faltan en nombres de ciudades frecuentes, palabra por palabra (por ejemplo Lanús, Morón o San Martín).
+expression fnCiudad =
+		let
+		    // Los nombres de ciudad llegan sin tildes en muchos casos: se corrigen palabra por palabra con una lista fija
+		    fnCiudad = (nombre as nullable text) as nullable text =>
+		        let
+		            Tildes = [
+		                Andres = "Andrés", Angelica = "Angélica", Baron = "Barón", Belen = "Belén", Bolivar = "Bolívar", Canuelas = "Cañuelas",
+		                Catan = "Catán", Chajari = "Chajarí", Colon = "Colón", Concepcion = "Concepción", Cordoba = "Córdoba", Echeverria = "Echeverría",
+		                Federacion = "Federación", Fernandez = "Fernández", Garin = "Garín", Gonzalez = "González", Gutierrez = "Gutiérrez",
+		                Ituzaingo = "Ituzaingó", Jachal = "Jáchal", Jesus = "Jesús", Joaquin = "Joaquín", Jose = "José", Junin = "Junín",
+		                Lanus = "Lanús", Leon = "León", Lopez = "López", Lujan = "Luján", Maria = "María", Marmol = "Mármol", Martin = "Martín",
+		                Martinez = "Martínez", Mejia = "Mejía", Millan = "Millán", Moron = "Morón", Pena = "Peña", Perez = "Pérez", Rio = "Río",
+		                Rodriguez = "Rodríguez", Saenz = "Sáenz", Suarez = "Suárez", Union = "Unión"
+		            ],
+		            Palabras = Text.Split(Text.Trim(nombre ?? ""), " "),
+		            Corregidas = List.Transform(Palabras, each Record.FieldOrDefault(Tildes, _, _)),
+		            Resultado = if nombre = null then null else Text.Combine(Corregidas, " ")
+		        in
+		            Resultado,
+		    Documentacion = type function (nombre as (type nullable text meta [Documentation.FieldCaption = "Ciudad tal como viene en el CSV"])) as nullable text
+		        meta [
+		            Documentation.Name = "fnCiudad",
+		            Documentation.LongDescription = "Corrige palabra por palabra las tildes que faltan en nombres de ciudades frecuentes, con una lista fija de equivalencias.",
+		            Documentation.Examples = {
+		                [Description = "Tilde faltante", Code = "fnCiudad(""Lanus"")", Result = """Lanús"""],
+		                [Description = "Varias palabras", Code = "fnCiudad(""Jose Leon Suarez"")", Result = """José León Suárez"""]
+		            }
+		        ]
+		in
+		    Value.ReplaceType(fnCiudad, Documentacion)
+	lineageTag: 462e7da2-1072-5d7f-9e6d-a90c9f93b708
+	queryGroup: Funciones
+
+	annotation PBI_ResultType = Function
+
+/// Base de clientes del sistema A (datos_clientes). Una fila por cliente.
+expression 'Clientes origen' =
+		let
+		    Origen = fnLeerCsv("datos_clientes - dataset.csv"),
+		    // Cultura en-US: las fechas vienen como 2018-07-03 0:02:10
+		    Tipos = Table.TransformColumnTypes(Origen, {{"user_id", type text}, {"nro_cliente", Int64.Type}, {"install_time", type datetime}, {"platform", type text}, {"country_region", type text}, {"city", type text}, {"gender", type text}}, "en-US"),
+		    // Una fila trae user_id pero no nro_cliente: sin ese número no se puede vincular con planes ni facturación
+		    ConNumero = Table.SelectRows(Tipos, each [nro_cliente] <> null)
+		in
+		    ConNumero
+	lineageTag: ef5bc80b-8975-5ab3-ac3e-ad13dd453f3c
+	queryGroup: Origen
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+
+/// Plan vigente de cada cliente en los meses 1, 2 y 3 (cliente_planes). El mes 1 es el más reciente.
+expression 'Planes origen' =
+		let
+		    Origen = fnLeerCsv("cliente_planes - cliente_cdp.csv"),
+		    // El código de plan es un identificador: se guarda como texto para que nunca se sume
+		    Tipos = Table.TransformColumnTypes(Origen, {{"mes", Int64.Type}, {"nro_cliente", Int64.Type}, {"Plan_mes", type text}}, "en-US")
+		in
+		    Tipos
+	lineageTag: cddee703-b27d-5ae5-91b8-f34a5dbf247f
+	queryGroup: Origen
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+
+/// Facturación en pesos y minutos de llamadas del trimestre (meses 1 a 3) por cliente.
+expression 'Facturación origen' =
+		let
+		    Origen = fnLeerCsv("facturacion_duracion_llamadas_trimestre - f.csv"),
+		    // Cultura en-US: los decimales vienen con punto (645.0071995)
+		    Tipos = Table.TransformColumnTypes(Origen, {{"nro_cliente", Int64.Type}, {"sum_fact", type number}, {"sum_duracion", type number}}, "en-US")
+		in
+		    Tipos
+	lineageTag: dd02744b-ad28-5941-b93f-621d7e1131d5
+	queryGroup: Origen
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+
+/// Listado de usuarios de las campañas de churn (segmentos), una fila por usuario del sistema B.
+expression 'Segmentos origen' =
+		let
+		    Origen = fnLeerCsv("segmentos.csv"),
+		    Tipos = Table.TransformColumnTypes(Origen, {{"user_id", type text}, {"target_churn_indicator", Int64.Type}, {"range_group", type text}, {"n_previous_registers", Int64.Type}}, "en-US"),
+		    // Cinco usuarios aparecen en más de una fila (una por registro): se deja una fila por usuario
+		    PorUsuario = Table.Group(Tipos, {"user_id"}, {
+		        {"En campaña", each List.Max([target_churn_indicator]) = 1, type logical},
+		        {"Rango de edad", each List.First([range_group]), type text},
+		        {"Registros en campañas", each List.Max([n_previous_registers]), Int64.Type}
+		    })
+		in
+		    PorUsuario
+	lineageTag: 8319b529-f951-51b4-b90f-34737e2486f1
+	queryGroup: Origen
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

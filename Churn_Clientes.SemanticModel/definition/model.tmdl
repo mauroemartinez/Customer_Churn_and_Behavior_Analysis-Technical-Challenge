@@ -1,0 +1,47 @@
+model Model
+	culture: es-AR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: es-AR
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+queryGroup Parámetros
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup Funciones
+
+	annotation PBI_QueryGroupOrder = 1
+
+queryGroup Origen
+
+	annotation PBI_QueryGroupOrder = 2
+
+queryGroup Hechos
+
+	annotation PBI_QueryGroupOrder = 3
+
+queryGroup Dimensiones
+
+	annotation PBI_QueryGroupOrder = 4
+
+queryGroup Auxiliares
+
+	annotation PBI_QueryGroupOrder = 5
+
+annotation PBI_QueryOrder = ["CarpetaDatos","fnLeerCsv","fnProvincia","fnCiudad","Clientes origen","Planes origen","Facturación origen","Segmentos origen","Planes mensuales","Facturación","Clientes","Meses","Medidas"]
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table Clientes
+ref table 'Planes mensuales'
+ref table Facturación
+ref table Meses
+ref table Medidas
+
+ref cultureInfo es-AR
+

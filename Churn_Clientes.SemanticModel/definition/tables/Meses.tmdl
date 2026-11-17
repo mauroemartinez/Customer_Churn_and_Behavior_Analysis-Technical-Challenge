@@ -1,0 +1,47 @@
+/// Dimensión de meses relativos del archivo de planes (3 es el más antiguo, 1 el más reciente).
+table Meses
+	lineageTag: b1a51004-e45e-5e5d-b687-17645f5206e2
+
+	column Mes
+		dataType: int64
+		isKey
+		formatString: 0
+		lineageTag: fa941b66-a815-5128-9556-efadbee73b1b
+		summarizeBy: none
+		sourceColumn: Mes
+
+		annotation SummarizationSetBy = User
+
+	column 'Nombre del mes'
+		dataType: string
+		lineageTag: a74edd47-884e-5375-8744-d244a41b58df
+		summarizeBy: none
+		sourceColumn: Nombre del mes
+		sortByColumn: Orden
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column Orden
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 99515d5f-1ac9-5832-9695-47eafbb10dd9
+		summarizeBy: none
+		sourceColumn: Orden
+
+		annotation SummarizationSetBy = User
+
+	partition Meses = m
+		mode: import
+		queryGroup: Dimensiones
+		source =
+				let
+				    // Meses relativos del archivo de planes: el mes 1 es el más reciente
+				    Origen = #table(type table [Mes = Int64.Type, #"Nombre del mes" = text, Orden = Int64.Type], {{3, "Mes 3", 1}, {2, "Mes 2", 2}, {1, "Mes 1 (más reciente)", 3}})
+				in
+				    Origen
+
+	annotation PBI_ResultType = Table
+

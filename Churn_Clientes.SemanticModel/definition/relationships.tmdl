@@ -1,0 +1,12 @@
+relationship 5d0265c8-df55-5c12-95de-862dc58b3533
+	fromColumn: 'Planes mensuales'.'Nro Cliente'
+	toColumn: Clientes.'Nro Cliente'
+
+relationship ebf4dd1a-76a0-5e22-a200-5757d7a87e1a
+	fromColumn: 'Planes mensuales'.Mes
+	toColumn: Meses.Mes
+
+relationship c8a9b7e4-578a-5430-b967-43fb2740184c
+	fromColumn: Facturación.'Nro Cliente'
+	toColumn: Clientes.'Nro Cliente'
+

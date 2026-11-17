@@ -1,0 +1,154 @@
+/// Tabla contenedora de las medidas del modelo, organizadas en carpetas por propósito.
+table Medidas
+	lineageTag: 5eccdf8c-8316-5b86-8baf-46d572879206
+
+	/// Clientes del sistema A en el contexto actual.
+	measure Clientes = COUNTROWS ( Clientes )
+		formatString: #,0
+		displayFolder: 1. Clientes
+		lineageTag: 51d1fa60-1948-5e04-9306-7664d594312a
+
+	/// Clientes con plan en el mes 2. Es el denominador de la tasa de churn.
+	measure 'Clientes base' = CALCULATE ( [Clientes], Clientes[Estado] IN { "Activo", "Baja" } )
+		formatString: #,0
+		displayFolder: 1. Clientes
+		lineageTag: 7aa9fc61-c853-55ae-a319-5fa0b042f295
+
+	/// Participación del grupo en el total de clientes seleccionados.
+	measure '% del total de clientes' = DIVIDE ( [Clientes], CALCULATE ( [Clientes], ALLSELECTED ( Clientes ) ) )
+		formatString: 0.0%
+		displayFolder: 1. Clientes
+		lineageTag: 2c36506a-3a82-59ba-ad1a-2f0dd78acf43
+
+	/// Clientes con un plan vigente en el mes del contexto.
+	measure 'Clientes con plan' = DISTINCTCOUNT ( 'Planes mensuales'[Nro Cliente] )
+		formatString: #,0
+		displayFolder: 1. Clientes
+		lineageTag: 23b9cea5-b814-57a1-a0f2-5555d16a1bb1
+
+	/// Clientes con plan en el mes 2 y sin registro en el mes 1 (el más reciente).
+	measure Bajas = IF ( NOT ISBLANK ( [Clientes base] ), CALCULATE ( [Clientes], Clientes[Estado] = "Baja" ) + 0 )
+		formatString: #,0
+		displayFolder: 2. Churn
+		lineageTag: 59717d70-2a25-58d8-97da-28449a04b614
+
+	/// Bajas sobre clientes con plan en el mes 2, con el mismo filtro en numerador y denominador.
+	measure 'Tasa de churn' = DIVIDE ( [Bajas], [Clientes base] )
+		formatString: 0.00%
+		displayFolder: 2. Churn
+		lineageTag: b3e1ee43-7d4c-5863-9e7f-5dfa7d4bc963
+
+	/// Complemento de la tasa de churn.
+	measure 'Tasa de retención' = IF ( NOT ISBLANK ( [Clientes base] ), 1 - [Tasa de churn] )
+		formatString: 0.00%
+		displayFolder: 2. Churn
+		lineageTag: 4ea43d92-b983-50a8-9863-15584e7b9952
+
+	/// Clientes con plan en el mes anterior (más antiguo) que no tienen plan en el mes del contexto. Vacío en el mes 3, que no tiene mes anterior.
+	measure 'Bajas en el mes' =
+			VAR mesActual = SELECTEDVALUE ( Meses[Mes] )
+			VAR clientesMesAnterior =
+			    CALCULATETABLE ( VALUES ( 'Planes mensuales'[Nro Cliente] ), REMOVEFILTERS ( Meses ), Meses[Mes] = mesActual + 1 )
+			VAR clientesMes =
+			    CALCULATETABLE ( VALUES ( 'Planes mensuales'[Nro Cliente] ), REMOVEFILTERS ( Meses ), Meses[Mes] = mesActual )
+			RETURN
+			    IF ( NOT ISBLANK ( mesActual ) && mesActual < 3, COUNTROWS ( EXCEPT ( clientesMesAnterior, clientesMes ) ) + 0 )
+		formatString: #,0
+		displayFolder: 2. Churn
+		lineageTag: 0d7454bc-c717-51df-9c8e-5ad612f632c4
+
+	/// Bajas del mes sobre los clientes con plan en el mes anterior.
+	measure 'Tasa de churn mensual' =
+			VAR mesActual = SELECTEDVALUE ( Meses[Mes] )
+			VAR clientesMesAnterior = CALCULATE ( [Clientes con plan], REMOVEFILTERS ( Meses ), Meses[Mes] = mesActual + 1 )
+			RETURN
+			    DIVIDE ( [Bajas en el mes], clientesMesAnterior )
+		formatString: 0.00%
+		displayFolder: 2. Churn
+		lineageTag: a1bb0c0e-3730-58b0-99a1-45ef1be04405
+
+	/// Facturación total en pesos del trimestre.
+	measure Facturación = SUM ( 'Facturación'[Facturación trimestre] )
+		formatString: \$ #,0
+		displayFolder: 3. Facturación
+		lineageTag: 2fea3f36-d816-559e-9e72-428b735162b1
+
+	/// Facturación trimestral promedio por cliente.
+	measure 'Facturación promedio' = AVERAGE ( 'Facturación'[Facturación trimestre] )
+		formatString: \$ #,0
+		displayFolder: 3. Facturación
+		lineageTag: e847b8cc-b8ae-50e8-8ebb-dd59cf9461d3
+
+	/// Facturación trimestral mediana por cliente.
+	measure 'Facturación mediana' = MEDIAN ( 'Facturación'[Facturación trimestre] )
+		formatString: \$ #,0
+		displayFolder: 3. Facturación
+		lineageTag: 505401c2-f128-5777-a388-5e0264182daf
+
+	/// Minutos de llamadas promedio por cliente en el trimestre.
+	measure 'Minutos promedio' = AVERAGE ( 'Facturación'[Minutos trimestre] )
+		formatString: #,0
+		displayFolder: 3. Facturación
+		lineageTag: 58f6815b-66db-5028-82e8-a8a5b9c27f1a
+
+	/// Facturación trimestral de los clientes que se dieron de baja.
+	measure 'Facturación de las bajas' = CALCULATE ( [Facturación], Clientes[Estado] = "Baja" )
+		formatString: \$ #,0
+		displayFolder: 3. Facturación
+		lineageTag: 453e603e-2178-5a95-8e87-a1dc9ffcc794
+
+	/// Parte de la facturación trimestral que correspondía a los clientes dados de baja.
+	measure '% de la facturación en bajas' = DIVIDE ( [Facturación de las bajas], [Facturación] )
+		formatString: 0.00%
+		displayFolder: 3. Facturación
+		lineageTag: 13f0c28b-88e0-596a-866d-fe310cd85e53
+
+	/// Facturación trimestral promedio de los clientes dados de baja.
+	measure 'Facturación promedio de las bajas' = CALCULATE ( [Facturación promedio], Clientes[Estado] = "Baja" )
+		formatString: \$ #,0
+		displayFolder: 3. Facturación
+		lineageTag: 0f723bca-6345-5aca-8b44-606d810b17d0
+
+	/// Facturación trimestral promedio de los clientes activos en el mes 1.
+	measure 'Facturación promedio de los activos' = CALCULATE ( [Facturación promedio], Clientes[Estado] = "Activo" )
+		formatString: \$ #,0
+		displayFolder: 3. Facturación
+		lineageTag: 44d3bc23-9495-51e6-a78e-26a743e830dd
+
+	/// Diferencia porcentual entre la facturación promedio de las bajas y la de los activos.
+	measure 'Diferencia de facturación de las bajas' = DIVIDE ( [Facturación promedio de las bajas], [Facturación promedio de los activos] ) - 1
+		formatString: 0%
+		displayFolder: 3. Facturación
+		lineageTag: 0be1b039-0017-56f0-b44a-0ea6d2f95871
+
+	/// Clientes que figuran en una campaña de churn vigente.
+	measure 'Clientes en campaña' = CALCULATE ( [Clientes], Clientes[Estado campaña] = "En campaña" )
+		formatString: #,0
+		displayFolder: 4. Campañas
+		lineageTag: e3890e00-e78f-5deb-bd17-bd5c57260490
+
+	/// Bajas de clientes que no figuran en el listado de campañas.
+	measure 'Bajas fuera del listado' = CALCULATE ( [Bajas], Clientes[Estado campaña] = "Fuera del listado" )
+		formatString: #,0
+		displayFolder: 4. Campañas
+		lineageTag: 7004fc1b-d983-579c-bdef-76e372ac54b5
+
+	/// Parte de las bajas que no figuraba en el listado de campañas.
+	measure '% de bajas fuera del listado' = DIVIDE ( [Bajas fuera del listado], [Bajas] )
+		formatString: 0.0%
+		displayFolder: 4. Campañas
+		lineageTag: 20d5dcbf-844c-5c6b-8699-5d4a4d4cef67
+
+	partition Medidas = m
+		mode: import
+		queryGroup: Auxiliares
+		source =
+				let
+				    // Tabla sin filas ni columnas: solo agrupa las medidas del modelo
+				    Origen = #table(type table [Columna = text], {}),
+				    SinColumnas = Table.RemoveColumns(Origen, {"Columna"})
+				in
+				    SinColumnas
+
+	annotation PBI_ResultType = Table
+

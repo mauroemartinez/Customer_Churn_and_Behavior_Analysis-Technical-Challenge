@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Churn_Clientes"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "cf85e3e1-bfec-5b01-b060-70e30756948b"
+  }
+}

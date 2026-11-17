@@ -1,0 +1,46 @@
+/// Hechos: facturación en pesos y minutos de llamadas del trimestre (meses 1 a 3), una fila por cliente.
+table Facturación
+	lineageTag: 398cafdf-a7c4-5fec-8c00-f5ac8bfd7f88
+
+	column 'Nro Cliente'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 3bc4a799-5d1e-5015-b794-65dbd9c1c57a
+		summarizeBy: none
+		sourceColumn: Nro Cliente
+
+		annotation SummarizationSetBy = User
+
+	/// Facturación total en pesos de los meses 1, 2 y 3.
+	column 'Facturación trimestre'
+		dataType: double
+		formatString: \$ #,0.00
+		lineageTag: 1971e861-1ec9-5bf7-a872-3bf29f88087e
+		summarizeBy: sum
+		sourceColumn: Facturación trimestre
+
+		annotation SummarizationSetBy = User
+
+	/// Minutos totales de llamadas de los meses 1, 2 y 3.
+	column 'Minutos trimestre'
+		dataType: double
+		formatString: #,0.0
+		lineageTag: 44c7f6b4-a97d-5508-9b79-131ea74fa383
+		summarizeBy: sum
+		sourceColumn: Minutos trimestre
+
+		annotation SummarizationSetBy = User
+
+	partition Facturación = m
+		mode: import
+		queryGroup: Hechos
+		source =
+				let
+				    Origen = #"Facturación origen",
+				    Nombres = Table.RenameColumns(Origen, {{"nro_cliente", "Nro Cliente"}, {"sum_fact", "Facturación trimestre"}, {"sum_duracion", "Minutos trimestre"}})
+				in
+				    Nombres
+
+	annotation PBI_ResultType = Table
+

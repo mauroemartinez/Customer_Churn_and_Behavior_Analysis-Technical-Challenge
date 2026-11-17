@@ -1,0 +1,48 @@
+/// Hechos: plan vigente de cada cliente por mes (una fila por cliente y mes). El mes 1 es el más reciente.
+table 'Planes mensuales'
+	lineageTag: 85a4e0a7-76fd-582e-82da-d0d3ed3be2c4
+
+	column 'Nro Cliente'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6c9b94f7-080d-5ad0-b693-dd398c3ae360
+		summarizeBy: none
+		sourceColumn: Nro Cliente
+
+		annotation SummarizationSetBy = User
+
+	column Mes
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 64abb647-f9e5-55f9-85ef-c23e49730fcc
+		summarizeBy: none
+		sourceColumn: Mes
+
+		annotation SummarizationSetBy = User
+
+	/// Código del plan vigente en el mes.
+	column Plan
+		dataType: string
+		lineageTag: 08645e9d-c53b-521b-8c62-722467ae53e8
+		summarizeBy: none
+		sourceColumn: Plan
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	partition 'Planes mensuales' = m
+		mode: import
+		queryGroup: Hechos
+		source =
+				let
+				    Origen = #"Planes origen",
+				    Nombres = Table.RenameColumns(Origen, {{"nro_cliente", "Nro Cliente"}, {"mes", "Mes"}, {"Plan_mes", "Plan"}}),
+				    Orden = Table.ReorderColumns(Nombres, {"Nro Cliente", "Mes", "Plan"})
+				in
+				    Orden
+
+	annotation PBI_ResultType = Table
+

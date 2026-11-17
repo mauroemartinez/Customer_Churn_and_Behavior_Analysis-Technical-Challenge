@@ -1,0 +1,255 @@
+/// Dimensión de clientes del sistema A: una fila por cliente, con su perfil, su estado en el mes más reciente, su cuartil de facturación y su situación en las campañas de churn.
+table Clientes
+	lineageTag: 186eb7c5-8d7d-532b-860a-46ab58462624
+
+	/// Identificador del cliente en el sistema A.
+	column 'Nro Cliente'
+		dataType: int64
+		isKey
+		formatString: 0
+		lineageTag: a2fb7ee6-b09a-540a-9a37-f9e66b376cb1
+		summarizeBy: none
+		sourceColumn: Nro Cliente
+
+		annotation SummarizationSetBy = User
+
+	/// Identificador del usuario en el sistema B, usado para vincular el listado de campañas.
+	column 'ID Usuario'
+		dataType: string
+		isHidden
+		lineageTag: 0f6da2ed-0ca4-5438-b0b8-fc1c4ccf32e2
+		summarizeBy: none
+		sourceColumn: ID Usuario
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	/// Fecha y hora de habilitación del cliente. La zona horaria no está documentada en la fuente.
+	column 'Fecha y hora de alta'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 22603efd-39de-5685-abef-2ad388a90739
+		summarizeBy: none
+		sourceColumn: Fecha y hora de alta
+
+		annotation SummarizationSetBy = User
+
+	/// Fecha de habilitación del cliente (todas entre el 30/06/2018 y el 07/07/2018).
+	column 'Fecha de alta'
+		dataType: dateTime
+		formatString: dd/MM
+		lineageTag: 26cf1d2f-5c1a-5656-a9b0-d8fea88469fe
+		summarizeBy: none
+		sourceColumn: Fecha de alta
+
+		annotation SummarizationSetBy = User
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	/// Hora de habilitación (0 a 23), según la marca de tiempo de la fuente.
+	column 'Hora de alta'
+		dataType: int64
+		formatString: 0
+		lineageTag: 54896da0-fb55-5058-a9f6-60f9d0cf844b
+		summarizeBy: none
+		sourceColumn: Hora de alta
+
+		annotation SummarizationSetBy = User
+
+	/// Sistema operativo actual del cliente.
+	column Plataforma
+		dataType: string
+		lineageTag: 1de09971-cf7d-5031-8339-d07196e7652f
+		summarizeBy: none
+		sourceColumn: Plataforma
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	/// Provincia actual, normalizada con fnProvincia.
+	column Provincia
+		dataType: string
+		lineageTag: 5ae00ee9-c606-5339-bcbe-cc8d64a9d40b
+		summarizeBy: none
+		sourceColumn: Provincia
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	/// Ciudad actual.
+	column Ciudad
+		dataType: string
+		lineageTag: 1db1d0da-0277-5d1e-82f0-33a5f1f4312f
+		summarizeBy: none
+		sourceColumn: Ciudad
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	/// Género según documento: Femenino, Masculino o Sin dato.
+	column Género
+		dataType: string
+		lineageTag: c8a34779-02f0-5de3-8c74-15539db207a3
+		summarizeBy: none
+		sourceColumn: Género
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	/// Activo si el cliente tiene plan en el mes 1; Baja si tenía plan en el mes 2 y no tiene registro en el mes 1.
+	column Estado
+		dataType: string
+		lineageTag: ef3bf53d-463f-5c95-a93c-02085cd3d020
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	/// Código del plan vigente en el mes 2, el mes base para medir las bajas.
+	column 'Plan base'
+		dataType: string
+		lineageTag: 413979ed-2ee5-5a29-87d0-7878c6998762
+		summarizeBy: none
+		sourceColumn: Plan base
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	/// En campaña, Registrado sin campaña actual o Fuera del listado, según el archivo de segmentos.
+	column 'Estado campaña'
+		dataType: string
+		lineageTag: 9f354cf3-f306-5119-8a34-e4ae07adf412
+		summarizeBy: none
+		sourceColumn: Estado campaña
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	/// Rango de edad del listado de campañas. Sin dato para los clientes que no figuran en ese listado.
+	column 'Rango de edad'
+		dataType: string
+		lineageTag: 9a8ab176-02ae-56df-971d-bda0351bfb46
+		summarizeBy: none
+		sourceColumn: Rango de edad
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	/// Cantidad de veces que el cliente estuvo en una campaña de churn (0 si no figura en el listado).
+	column 'Registros en campañas'
+		dataType: int64
+		formatString: 0
+		lineageTag: 5456f1b8-28aa-5454-8f58-087a9e2834ff
+		summarizeBy: none
+		sourceColumn: Registros en campañas
+
+		annotation SummarizationSetBy = User
+
+	/// Cuartil de facturación trimestral: cuatro grupos con la misma cantidad de clientes.
+	column 'Cuartil de facturación'
+		dataType: string
+		lineageTag: 67f2fde3-7e48-5809-a1c7-c2e59786f912
+		summarizeBy: none
+		sourceColumn: Cuartil de facturación
+		sortByColumn: 'Orden cuartil facturación'
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column 'Orden cuartil facturación'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8cd454d6-d792-54b4-9f01-a641ba0caccb
+		summarizeBy: none
+		sourceColumn: Orden cuartil facturación
+
+		annotation SummarizationSetBy = User
+
+	/// Cuartil de minutos de llamadas del trimestre: cuatro grupos con la misma cantidad de clientes.
+	column 'Cuartil de minutos'
+		dataType: string
+		lineageTag: e73a5fab-582b-5f80-b347-d1e367473873
+		summarizeBy: none
+		sourceColumn: Cuartil de minutos
+		sortByColumn: 'Orden cuartil minutos'
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column 'Orden cuartil minutos'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6abd88cf-19ca-5f31-a4e1-e2f01e418219
+		summarizeBy: none
+		sourceColumn: Orden cuartil minutos
+
+		annotation SummarizationSetBy = User
+
+	partition Clientes = m
+		mode: import
+		queryGroup: Dimensiones
+		source =
+				let
+				    Origen = #"Clientes origen",
+				    // Estado del cliente: Baja si tenía plan en el mes 2 y no tiene registro en el mes 1 (el más reciente)
+				    Planes = Table.Buffer(#"Planes origen"),
+				    PlanMes2 = Table.RenameColumns(Table.SelectColumns(Table.SelectRows(Planes, each [mes] = 2), {"nro_cliente", "Plan_mes"}), {{"Plan_mes", "Plan base"}}),
+				    ConPlanBase = Table.ExpandTableColumn(Table.NestedJoin(Origen, {"nro_cliente"}, PlanMes2, {"nro_cliente"}, "M2", JoinKind.LeftOuter), "M2", {"Plan base"}),
+				    ClientesMes1 = Table.AddColumn(Table.SelectColumns(Table.SelectRows(Planes, each [mes] = 1), {"nro_cliente"}), "Con plan en el mes 1", each true, type logical),
+				    ConMes1 = Table.ExpandTableColumn(Table.NestedJoin(ConPlanBase, {"nro_cliente"}, ClientesMes1, {"nro_cliente"}, "M1", JoinKind.LeftOuter), "M1", {"Con plan en el mes 1"}),
+				    Estado = Table.AddColumn(ConMes1, "Estado", each if [Plan base] = null then "Sin plan en el mes 2" else if [Con plan en el mes 1] = true then "Activo" else "Baja", type text),
+				    SinAuxiliar = Table.RemoveColumns(Estado, {"Con plan en el mes 1"}),
+				    // Cuartiles: se ordena a los clientes por facturación (o minutos) y se divide la lista en cuatro grupos del mismo tamaño
+				    Base = Table.Buffer(#"Facturación origen"),
+				    Total = Table.RowCount(Base),
+				    PorFacturacion = Table.AddIndexColumn(Table.Sort(Base, {{"sum_fact", Order.Ascending}, {"nro_cliente", Order.Ascending}}), "PosicionFacturacion", 0, 1, Int64.Type),
+				    PorMinutos = Table.AddIndexColumn(Table.Sort(PorFacturacion, {{"sum_duracion", Order.Ascending}, {"nro_cliente", Order.Ascending}}), "PosicionMinutos", 0, 1, Int64.Type),
+				    Cuartiles = Table.TransformColumns(
+				        Table.SelectColumns(PorMinutos, {"nro_cliente", "PosicionFacturacion", "PosicionMinutos"}),
+				        {{"PosicionFacturacion", each Number.IntegerDivide(_ * 4, Total) + 1, Int64.Type}, {"PosicionMinutos", each Number.IntegerDivide(_ * 4, Total) + 1, Int64.Type}}),
+				    ConCuartiles = Table.ExpandTableColumn(
+				        Table.NestedJoin(SinAuxiliar, {"nro_cliente"}, Cuartiles, {"nro_cliente"}, "Q", JoinKind.LeftOuter),
+				        "Q", {"PosicionFacturacion", "PosicionMinutos"}, {"Orden cuartil facturación", "Orden cuartil minutos"}),
+				    CuartilFacturacion = Table.AddColumn(ConCuartiles, "Cuartil de facturación", each {"Q1 (menor)", "Q2", "Q3", "Q4 (mayor)"}{[Orden cuartil facturación] - 1}, type text),
+				    CuartilMinutos = Table.AddColumn(CuartilFacturacion, "Cuartil de minutos", each {"Q1 (menos)", "Q2", "Q3", "Q4 (más)"}{[Orden cuartil minutos] - 1}, type text),
+				    // Campañas: el listado de segmentos se vincula por user_id (identificador del sistema B)
+				    ConSegmento = Table.ExpandTableColumn(
+				        Table.NestedJoin(CuartilMinutos, {"user_id"}, Table.Buffer(#"Segmentos origen"), {"user_id"}, "S", JoinKind.LeftOuter),
+				        "S", {"En campaña", "Rango de edad", "Registros en campañas"}, {"EnCampania", "RangoEdad", "RegistrosCampania"}),
+				    EstadoCampania = Table.AddColumn(ConSegmento, "Estado campaña", each
+				        if [EnCampania] = true then "En campaña"
+				        else if [EnCampania] = false then "Registrado sin campaña actual"
+				        else "Fuera del listado", type text),
+				    RangoEdad = Table.AddColumn(EstadoCampania, "Rango de edad", each Record.FieldOrDefault([a = "Rango a", b = "Rango b", no_valid_range = "Rango no válido"], [RangoEdad] ?? "", "Sin dato"), type text),
+				    Registros = Table.AddColumn(RangoEdad, "Registros en campañas", each [RegistrosCampania] ?? 0, Int64.Type),
+				    // Textos: provincias con fnProvincia, ciudades con fnCiudad y género en español
+				    Textos = Table.TransformColumns(Registros, {
+				        {"country_region", fnProvincia, type text},
+				        {"city", fnCiudad, type text},
+				        {"gender", each Record.FieldOrDefault([female = "Femenino", male = "Masculino"], _, "Sin dato"), type text}
+				    }),
+				    FechaAlta = Table.AddColumn(Textos, "Fecha de alta", each DateTime.Date([install_time]), type date),
+				    HoraAlta = Table.AddColumn(FechaAlta, "Hora de alta", each Time.Hour([install_time]), Int64.Type),
+				    Nombres = Table.RenameColumns(HoraAlta, {{"nro_cliente", "Nro Cliente"}, {"user_id", "ID Usuario"}, {"install_time", "Fecha y hora de alta"}, {"platform", "Plataforma"}, {"country_region", "Provincia"}, {"city", "Ciudad"}, {"gender", "Género"}}),
+				    Columnas = Table.SelectColumns(Nombres, {"Nro Cliente", "ID Usuario", "Fecha y hora de alta", "Fecha de alta", "Hora de alta", "Plataforma", "Provincia", "Ciudad", "Género", "Estado", "Plan base", "Estado campaña", "Rango de edad", "Registros en campañas", "Cuartil de facturación", "Orden cuartil facturación", "Cuartil de minutos", "Orden cuartil minutos"}),
+				    // Tipos finales explícitos para cada columna que se carga al modelo
+				    TiposFinales = Table.TransformColumnTypes(Columnas, {{"Nro Cliente", Int64.Type}, {"ID Usuario", type text}, {"Fecha y hora de alta", type datetime}, {"Fecha de alta", type date}, {"Hora de alta", Int64.Type}, {"Plataforma", type text}, {"Provincia", type text}, {"Ciudad", type text}, {"Género", type text}, {"Estado", type text}, {"Plan base", type text}, {"Estado campaña", type text}, {"Rango de edad", type text}, {"Registros en campañas", Int64.Type}, {"Cuartil de facturación", type text}, {"Orden cuartil facturación", Int64.Type}, {"Cuartil de minutos", type text}, {"Orden cuartil minutos", Int64.Type}})
+				in
+				    TiposFinales
+
+	annotation PBI_ResultType = Table
+

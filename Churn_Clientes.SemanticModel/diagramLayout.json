@@ -1,0 +1,87 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 1136.57687716578,
+            "y": 130.04354838271411
+          },
+          "nodeIndex": "Medidas",
+          "nodeLineageTag": "5eccdf8c-8316-5b86-8baf-46d572879206",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 334.17941566988623,
+            "y": 138.76878482937897
+          },
+          "nodeIndex": "Clientes",
+          "nodeLineageTag": "186eb7c5-8d7d-532b-860a-46ab58462624",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 358.08709676542821
+          },
+          "nodeIndex": "Facturación",
+          "nodeLineageTag": "398cafdf-a7c4-5fec-8c00-f5ac8bfd7f88",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 902.57687716577982,
+            "y": -50
+          },
+          "nodeIndex": "Meses",
+          "nodeLineageTag": "b1a51004-e45e-5e5d-b687-17645f5206e2",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 618.37645520037063,
+            "y": 64.871234307167754
+          },
+          "nodeIndex": "Planes mensuales",
+          "nodeLineageTag": "85a4e0a7-76fd-582e-82da-d0d3ed3be2c4",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}
