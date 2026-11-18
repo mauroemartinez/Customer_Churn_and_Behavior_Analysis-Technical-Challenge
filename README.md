@@ -1,4 +1,8 @@
-# 📉 Customer Churn & Behavior Analysis (Technical Challenge)
+# 📉 Customer Churn & Behavior Analysis
+<p>
+  <a href="README.md"><img src="https://raw.githubusercontent.com/mauroemartinez/mauroemartinez/main/assets/lang/en-active.svg" alt="English" height="30"></a>
+  <a href="README.es.md"><img src="https://raw.githubusercontent.com/mauroemartinez/mauroemartinez/main/assets/lang/es.svg" alt="Leer en español" height="30"></a>
+</p>
 
 ## 📽️ Dashboard Preview
 <p align="center">
@@ -7,7 +11,7 @@
 
 <p align="center"><a href="docs/Preview.mp4">▶️ Watch the walkthrough in full quality (MP4)</a></p>
 
-> Developed as a technical challenge for a Business Intelligence / Data Analyst position. The dashboard is in Spanish.
+> The dashboard is in Spanish.
 > The repository includes the report as a regular **.pbix** file and as a **Power BI Project (PBIP)**, so the data model, the DAX measures and the Power Query code can be read right here on GitHub.
 
 **Stack:** ![Power BI](https://img.shields.io/badge/Power_BI-F2C811?style=flat-square&logo=powerbi&logoColor=black) ![DAX](https://img.shields.io/badge/DAX-0176D3?style=flat-square&logo=microsoft&logoColor=white) ![Power Query](https://img.shields.io/badge/Power_Query-217346?style=flat-square&logo=powerbi&logoColor=white) ![PBIP](https://img.shields.io/badge/PBIP-TMDL_%2B_PBIR-5C2D91?style=flat-square&logo=powerbi&logoColor=white)
@@ -15,7 +19,7 @@
 ## 📋 Executive Summary
 An analysis of customer retention for a service with **10,900 customers**: who they are, when they were activated, which plan they had in each month, how much they were billed in the quarter and whether they were part of a churn campaign.
 
-The data comes from four CSV files provided with the challenge (customers, monthly plans, quarterly billing and call minutes, and the churn campaign list) plus a data dictionary.
+The data comes from four CSV files (customers, monthly plans, quarterly billing and call minutes, and the churn campaign list) plus a data dictionary.
 
 **How churn is measured.** A customer counts as churned when they had a plan in month 2 and have no plan record in month 1, the most recent month. The churn rate divides churned customers by the customers with a plan in month 2, with the same filters in both terms, so it can be read for any group. The source does not say why a plan record is missing: a churned customer can be a cancellation, a suspension or a missing record.
 
@@ -167,6 +171,6 @@ Every table, column, measure and Power Query step can be reviewed in [`Churn_Cli
 Both files contain the same report.
 
 ## 👤 Author
-**Mauro Martínez**. The data was provided with the technical challenge.
+**Mauro Martínez**.
 
 The project files are released under the [MIT License](LICENSE). The data remains subject to the terms of its source.
